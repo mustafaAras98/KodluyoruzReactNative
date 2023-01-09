@@ -1,34 +1,68 @@
-import React, {useState} from 'react';
-import {View, Text, Button, FlatList} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Button, FlatList} from 'react-native';
 
 import Config from 'react-native-config';
 import useFetch from '../../hooks/useFetch';
 
+import JobCard from '../../components/Cards/JobCard';
+import Loading from '../../components/Loading';
+import Error from '../../components/Error';
+
 const JobsPage = ({navigation}) => {
   const [page, setPage] = useState(1);
-  const {data, loading, error} = useFetch(`${Config.API_URL}?page=${page}`);
-  const handlePress = () => {
-    navigation.navigate('JobsDetails');
-  };
+  const [isIncrementDisabled, setIsIncrementDisabled] = useState(false);
+  const [isDecrementDisabled, setIsDecrementDisabled] = useState(true);
 
+  const {data, loading, error} = useFetch(`${Config.API_URL}?page=${page}`);
+
+  useEffect(() => {
+    if (page < 2) {
+      setIsDecrementDisabled(true);
+      setIsIncrementDisabled(false);
+    } else if (page > 98) {
+      setIsIncrementDisabled(true);
+      setIsDecrementDisabled(false);
+    } else {
+      setIsDecrementDisabled(false);
+      setIsIncrementDisabled(false);
+    }
+  }, [page]);
+
+  const handlePress = id => {
+    navigation.navigate('JobsDetails', {ID: id});
+  };
+  const renderJob = ({item}) => (
+    <JobCard job={item} onPress={() => handlePress(item.id)} />
+  );
+
+  if (loading) {
+    return <Loading />;
+  }
+  if (error) {
+    return <Error />;
+  }
   return (
     <View>
-      <Text> jobspage: </Text>
       <FlatList
         data={data.results}
-        renderItem={({item}) => {
-          return (
-            <View>
-              <Text>{item.short_name}</Text>
-            </View>
-          );
-        }}
+        renderItem={renderJob}
         keyExtractor={item => item.id}
         extraData={data}
+        ListFooterComponent={
+          <View>
+            <Button
+              title="+"
+              onPress={() => setPage(page + 1)}
+              disabled={isIncrementDisabled}
+            />
+            <Button
+              title="-"
+              onPress={() => setPage(page - 1)}
+              disabled={isDecrementDisabled}
+            />
+          </View>
+        }
       />
-      <Button title="Go To Details.." onPress={handlePress} />
-      <Button title="+" onPress={() => setPage(page + 1)} />
-      <Button title="-" onPress={() => setPage(page - 1)} />
     </View>
   );
 };
