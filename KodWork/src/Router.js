@@ -14,7 +14,10 @@ const Stack = createStackNavigator();
 
 function JobStackNavigator() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}>
       <Stack.Screen name="Jobs" component={Jobs} />
       <Stack.Screen name="JobsDetails" component={JobsDetails} />
     </Stack.Navigator>

@@ -1,12 +1,15 @@
 import React, {useState, useEffect} from 'react';
-import {View, Button, FlatList} from 'react-native';
+import {View, Text, FlatList} from 'react-native';
 
 import Config from 'react-native-config';
 import useFetch from '../../hooks/useFetch';
 
 import JobCard from '../../components/Cards/JobCard';
+import CountButton from '../../components/Button/CountButton';
 import Loading from '../../components/Loading';
 import Error from '../../components/Error';
+
+import styles from './JobsPage.style';
 
 const JobsPage = ({navigation}) => {
   const [page, setPage] = useState(1);
@@ -49,16 +52,17 @@ const JobsPage = ({navigation}) => {
         keyExtractor={item => item.id}
         extraData={data}
         ListFooterComponent={
-          <View>
-            <Button
-              title="+"
-              onPress={() => setPage(page + 1)}
-              disabled={isIncrementDisabled}
-            />
-            <Button
-              title="-"
+          <View style={styles.Container}>
+            <CountButton
+              text="-"
               onPress={() => setPage(page - 1)}
-              disabled={isDecrementDisabled}
+              isDisabled={isDecrementDisabled}
+            />
+            <Text style={styles.PageText}>{page}</Text>
+            <CountButton
+              text="+"
+              onPress={() => setPage(page + 1)}
+              isDisabled={isIncrementDisabled}
             />
           </View>
         }
